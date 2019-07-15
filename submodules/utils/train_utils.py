@@ -3,7 +3,7 @@ import random
 import json
 import os
 import itertools
-from scipy.misc import imread, imresize
+#from scipy.misc import imread, imresize
 import tensorflow as tf
 
 from PIL import Image, ImageDraw

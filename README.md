@@ -156,3 +156,9 @@ This project started out as a fork of [TensorBox](https://github.com/TensorBox/T
 -------
 
 <a name="myfootnote1">1</a>: Code to reproduce the Faster-RCNN can be found [here](https://github.com/MarvinTeichmann/kitti). The repository contains the official py-faster-rcnn code applied to the Kitti Object Detection Dataset.
+
+
+# Troubleshooting
+1. `scipy.misc` is depreciated
+2. `cython3` is needed: https://github.com/MarvinTeichmann/KittiBox/issues/56
+3. Install older version of numpy! 

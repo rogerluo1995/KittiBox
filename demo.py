@@ -41,6 +41,9 @@ import numpy as np
 import scipy as scp
 import scipy.misc
 import tensorflow as tf
+import skimage
+import skimage.color
+import imageio
 
 
 flags = tf.app.flags
@@ -134,8 +137,7 @@ def main(_):
         image = tf.expand_dims(image_pl, 0)
 
         # build Tensorflow graph using the model from logdir
-        prediction = core.build_inference_graph(hypes, modules,
-                                                image=image)
+        prediction = core.build_inference_graph(hypes, modules, image=image)
 
         logging.info("Graph build successfully.")
 
@@ -152,10 +154,10 @@ def main(_):
     logging.info("Starting inference using {} as input".format(input_image))
 
     # Load and resize input image
-    image = scp.misc.imread(input_image)
-    image = scp.misc.imresize(image, (hypes["image_height"],
-                                      hypes["image_width"]),
-                              interp='cubic')
+    image = skimage.io.imread(input_image)
+    #image = skimage.transform.iradon(image, interpolation='cubic')
+    # image = skimage.transform.resize(image, (hypes["image_height"],
+    #                                   hypes["image_width"]))
     feed = {image_pl: image}
 
     # Run KittiBox model on image
@@ -200,7 +202,7 @@ def main(_):
     else:
         output_name = FLAGS.output_image
 
-    scp.misc.imsave(output_name, output_image)
+    imageio.imwrite(output_name, output_image)
     logging.info("")
     logging.info("Output image saved to {}".format(output_name))
 
