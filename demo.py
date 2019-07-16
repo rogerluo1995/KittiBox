@@ -28,6 +28,7 @@ import logging
 import os
 import sys
 
+
 import collections
 
 # configure logging
@@ -35,6 +36,9 @@ import collections
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.INFO,
                     stream=sys.stdout)
+# Used to profile the program 
+import tempfile
+from tensorflow.python.client import timeline
 
 # https://github.com/tensorflow/tensorflow/issues/2034#issuecomment-220820070
 import numpy as np
@@ -75,7 +79,6 @@ flags.DEFINE_string('output_image', None,
 default_run = 'KittiBox_pretrained'
 weights_url = ("ftp://mi.eng.cam.ac.uk/"
                "pub/mttt2/models/KittiBox_pretrained.zip")
-
 
 def maybe_download_and_extract(runs_dir):
     logdir = os.path.join(runs_dir, default_run)
@@ -164,9 +167,19 @@ def main(_):
     pred_boxes = prediction['pred_boxes_new']
     pred_confidences = prediction['pred_confidences']
 
+    options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+    run_metadata = tf.RunMetadata()
+
     (np_pred_boxes, np_pred_confidences) = sess.run([pred_boxes,
                                                      pred_confidences],
-                                                    feed_dict=feed)
+                                                    feed_dict=feed,  \
+                                                    options=options,  run_metadata=run_metadata)
+    
+    # Create the Timeline object, and write it to a json file
+    fetched_timeline = timeline.Timeline(run_metadata.step_stats)
+    chrome_trace = fetched_timeline.generate_chrome_trace_format()
+    with open('timeline_01.json', 'w') as f:
+        f.write(chrome_trace)
 
     # Apply non-maximal suppression
     # and draw predictions on the image
